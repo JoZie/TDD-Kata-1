@@ -1,5 +1,8 @@
  cmake_minimum_required(VERSION 3.0)
 
+ set (CAMAKE_CXX_STANDARD 14)
+ set (CAMAKE_CXX_STANDARD_REQUIRED ON)
+
  project(cmake_test)
 
  # Prepare "Catch" library for other executables
