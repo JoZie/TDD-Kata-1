@@ -1,5 +1,6 @@
 #include <catch.hpp>
 #include <string>
+#include <cstring>
 
 class StringCalculator
 {
@@ -7,11 +8,19 @@ class StringCalculator
         int
         AddString( const std::string& numbers )
         {
+            int sum = 0;
+
             if (numbers == "")
-                return 0;
+                return sum;
 
-            return std::stoi( numbers );
+            const char* number = std::strtok( const_cast<char*>(numbers.c_str()), "," );
+            while (number)
+            {
+                sum += std::stoi( number );
+                number = std::strtok( nullptr, "," );
+            }
 
+            return sum;
         } // AddString
 
 
@@ -31,6 +40,15 @@ TEST_CASE( "AddString( const std::string& numbers )", "StringCalculator" )
         REQUIRE( calc.AddString( "1" ) == 1 );
         REQUIRE( calc.AddString( "42" ) == 42 );
         REQUIRE( calc.AddString( "-100" ) == -100 );
+    }
+
+    SECTION( "Passing 2 comma separated numbers should return their sum" )
+    {
+        REQUIRE( calc.AddString( "1," ) == 1 );
+        REQUIRE( calc.AddString( ",2" ) == 2 );
+        REQUIRE( calc.AddString( "1,2" ) == 3 );
+        REQUIRE( calc.AddString( "42,-21" ) == 21 );
+        REQUIRE( calc.AddString( "-100,-200" ) == -300 );
     }
 
 }
