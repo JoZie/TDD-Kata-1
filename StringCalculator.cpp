@@ -51,4 +51,13 @@ TEST_CASE( "AddString( const std::string& numbers )", "StringCalculator" )
         REQUIRE( calc.AddString( "-100,-200" ) == -300 );
     }
 
+    SECTION( "Passing multiple comma separated numbers should return their sum" )
+    {
+        REQUIRE( calc.AddString( ",,,," ) == 0 );
+        REQUIRE( calc.AddString( "1,,,," ) == 1 );
+        REQUIRE( calc.AddString( ",2,,,,,," ) == 2 );
+        REQUIRE( calc.AddString( "1,2,3" ) == 6 );
+        REQUIRE( calc.AddString( "42,-21,-21,100" ) == 100 );
+    }
+
 }
