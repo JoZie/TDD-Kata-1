@@ -10,25 +10,32 @@ class StringCalculator
         AddString( const std::string& numbers )
         {
             int sum = 0;
+            char seperator = ',';
 
             if (numbers == "")
                 return sum;
 
-            std::vector<char*> token_comma;
-            char* number = std::strtok( const_cast<char*>(numbers.c_str()), "," );
-            while (number)
+            std::vector<char*> token_line;
+            char* line = std::strtok( const_cast<char*>(numbers.c_str()), "\n" );
+            while (line)
             {
-                token_comma.push_back( number );
-                number = std::strtok( nullptr, "," );
+                token_line.push_back( line );
+                line = std::strtok( nullptr, "\n" );
             }
 
-            for (auto it : token_comma)
+            if ( strncmp( token_line[0], "//", 2 ) == 0 )
             {
-                number = std::strtok( it, "\n" );
+                seperator = *std::strtok( token_line[0], "//" );
+                token_line.erase(token_line.begin());
+            }
+
+            for (auto it : token_line)
+            {
+                char* number = std::strtok( it, &seperator );
                 while (number)
                 {
                     sum += std::stoi( number );
-                    number = std::strtok( nullptr, "\n" );
+                    number = std::strtok( nullptr, &seperator );
                 }
             }
 
@@ -78,6 +85,12 @@ TEST_CASE( "AddString( const std::string& numbers )", "StringCalculator" )
         REQUIRE( calc.AddString( "1\n2\n3" ) == 6 );
         REQUIRE( calc.AddString( "1\n2,3" ) == 6 );
         REQUIRE( calc.AddString( "42,-21\n-21,100" ) == 100 );
+    }
+
+    SECTION( "Define the seperator beforehand (, is default)" )
+    {
+        REQUIRE( calc.AddString( "1,2,3" ) == 6 );
+        REQUIRE( calc.AddString( "//|\n1|2|3" ) == 6 );
     }
 
 }
