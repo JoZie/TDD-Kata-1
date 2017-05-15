@@ -1,6 +1,7 @@
 #include <catch.hpp>
 #include <string>
 #include <cstring>
+#include <vector>
 
 class StringCalculator
 {
@@ -13,11 +14,22 @@ class StringCalculator
             if (numbers == "")
                 return sum;
 
-            const char* number = std::strtok( const_cast<char*>(numbers.c_str()), "," );
+            std::vector<char*> token_comma;
+            char* number = std::strtok( const_cast<char*>(numbers.c_str()), "," );
             while (number)
             {
-                sum += std::stoi( number );
+                token_comma.push_back( number );
                 number = std::strtok( nullptr, "," );
+            }
+
+            for (auto it : token_comma)
+            {
+                number = std::strtok( it, "\n" );
+                while (number)
+                {
+                    sum += std::stoi( number );
+                    number = std::strtok( nullptr, "\n" );
+                }
             }
 
             return sum;
@@ -58,6 +70,14 @@ TEST_CASE( "AddString( const std::string& numbers )", "StringCalculator" )
         REQUIRE( calc.AddString( ",2,,,,,," ) == 2 );
         REQUIRE( calc.AddString( "1,2,3" ) == 6 );
         REQUIRE( calc.AddString( "42,-21,-21,100" ) == 100 );
+    }
+
+    SECTION( "Allow \\n as seperator" )
+    {
+        REQUIRE( calc.AddString( "\n," ) == 0 );
+        REQUIRE( calc.AddString( "1\n2\n3" ) == 6 );
+        REQUIRE( calc.AddString( "1\n2,3" ) == 6 );
+        REQUIRE( calc.AddString( "42,-21\n-21,100" ) == 100 );
     }
 
 }
